@@ -196,6 +196,11 @@ class HttpFT(basepoller.BasePollerFT):
         if self.username is not None and self.password is not None:
             rkwargs['auth'] = (self.username, self.password)
 
+        rkwargs['proxies'] = {
+            'http': 'http://192.168.1.3:8888',
+            'https': 'http://192.168.1.3:8888'
+        }
+
         r = requests.get(
             self.url,
             **rkwargs
