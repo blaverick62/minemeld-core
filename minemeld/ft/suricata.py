@@ -63,8 +63,7 @@ class SuricataOutput(actorbase.ActorBaseFT):
 
 		try:
 			with open(self.suricata_filepath + 'minemeld-' + day + '.rules', 'a+') as f:
-				if fields['message'] == "update":
-					f.write("Indicator:{},Origin:{},first_seen:{},last_seen:{}".format(fields['@indicator'], fields['@origin'], fields['first_seen'], fields['last_seen']))
+				f.write("Indicator:{},Origin:{},first_seen:{},last_seen:{}".format(fields['@indicator'], fields['@origin'], fields['first_seen'], fields['last_seen']))
 		except:
 			raise
 
