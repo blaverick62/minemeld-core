@@ -46,7 +46,7 @@ class SuricataOutput(actorbase.ActorBaseFT):
 		if source is not None:
 			fields['@origin'] = source
 
-		if value is not None
+		if value is not None:
 			fields.update(value)
 
 		if 'last_seen' in fields:
