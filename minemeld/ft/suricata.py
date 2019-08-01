@@ -29,7 +29,7 @@ class SuricataOutput(actorbase.ActorBaseFT):
 
 	def reset(self):
 		pass
-fuck
+
 	def _write_suricata_rules(self, message, source=None, indicator=None, value=None):
 		now = datetime.datetime.now()
 		d = datetime.datetime.today()
