@@ -61,7 +61,7 @@ class SuricataOutput(actorbase.ActorBaseFT):
 			)
 			fields['first_seen'] = first_seen.isoformat()+'Z'
 
-		with open(self.suricata_filepath + "minemeld-" + day + ".rules", 'a+') as f:
+		with open("/DIP/suricata/minemeld.rules", 'a+') as f:
 			f.write("Indicator:{},Origin:{},first_seen:{},last_seen:{}".format(fields['@indicator'], fields['@origin'], fields['first_seen'], fields['last_seen']))
 
 		self.statistics['message.sent'] += 1
