@@ -19,7 +19,7 @@ class SuricataOutput(actorbase.ActorBaseFT):
 	def configure(self):
 		super(SuricataOutput, self).configure()
 
-		self.suricata_filepath = self.config.get('suricata_filepath', '/DIP/suricata/')
+		self.suricata_filepath = self.config.get('suricata_filepath', "/DIP/suricata/")
 
 	def initialize(self):
 		pass
@@ -29,7 +29,7 @@ class SuricataOutput(actorbase.ActorBaseFT):
 
 	def reset(self):
 		pass
-
+fuck
 	def _write_suricata_rules(self, message, source=None, indicator=None, value=None):
 		now = datetime.datetime.now()
 		d = datetime.datetime.today()
@@ -61,11 +61,8 @@ class SuricataOutput(actorbase.ActorBaseFT):
 			)
 			fields['first_seen'] = first_seen.isoformat()+'Z'
 
-		try:
-			with open(self.suricata_filepath + "minemeld-" + day + ".rules", 'a+') as f:
-				f.write("Indicator:{},Origin:{},first_seen:{},last_seen:{}".format(fields['@indicator'], fields['@origin'], fields['first_seen'], fields['last_seen']))
-		except:
-			raise
+		with open(self.suricata_filepath + "minemeld-" + day + ".rules", 'a+') as f:
+			f.write("Indicator:{},Origin:{},first_seen:{},last_seen:{}".format(fields['@indicator'], fields['@origin'], fields['first_seen'], fields['last_seen']))
 
 		self.statistics['message.sent'] += 1
 
@@ -78,6 +75,7 @@ class SuricataOutput(actorbase.ActorBaseFT):
 			value=value
 		)
 
+	@base._counting('withdraw.processed')
 	def filtered_withdraw(self, source=None, indicator=None, value=None):
 		self._write_suricata_rules(
 			'withdraw',
