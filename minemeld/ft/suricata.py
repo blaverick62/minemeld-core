@@ -62,7 +62,10 @@ class SuricataOutput(actorbase.ActorBaseFT):
 			fields['first_seen'] = first_seen.isoformat()+'Z'
 
 		try:
-			sources = ", ".join(fields['sources'])
+			if len(fields['sources'] <= 1):
+				sources = fields['sources'][0]
+			else:
+				sources = ", ".join(fields['sources'])
 		except Exception as e:
 			LOG.exception("Error parsing out sources field: \n\t" + e)
 			raise
