@@ -74,14 +74,15 @@ class SuricataOutput(actorbase.ActorBaseFT):
 			sources = sources + ': ' + ", ".join(fields['recordedfuture_evidencedetails'])
 
 		try:
-			with open(self.suricata_filepath + 'minemeld-' + day + '.rules', 'a+') as f:
-				f.write("alert ip $HOME_NET any -> {} any (msg:\"{}. Confidence: {}\"; classtype:trojan-activity; sid:{}; rev:1;)\n".format(
-					fields['@indicator'],
-					sources,
-					fields['confidence'],
-					self.statistics['message.sent']
+			if self.message == "update":
+				with open(self.suricata_filepath + 'minemeld-' + day + '.rules', 'a+') as f:
+					f.write("alert ip $HOME_NET any -> {} any (msg:\"{}. Confidence: {}\"; classtype:trojan-activity; sid:{}; rev:1;)\n".format(
+						fields['@indicator'],
+						sources,
+						fields['confidence'],
+						self.statistics['message.sent']
+						)
 					)
-				)
 		except Exception as e:
 			LOG.exception("Error writing suricata rules: \n\t" + e.message)
 			raise
