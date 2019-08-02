@@ -64,7 +64,7 @@ class SuricataOutput(actorbase.ActorBaseFT):
 		try:
 			with open(self.suricata_filepath + 'minemeld-' + day + '.rules', 'a+') as f:
 				f.write("{} {}\n".format(fields['@indicator'], fields['@origin']))
-		except as e:
+		except Exception as e:
 			LOG.exception("Error writing suricata rules: \n\t" + e)
 			raise
 
