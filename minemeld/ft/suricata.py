@@ -62,12 +62,12 @@ class SuricataOutput(actorbase.ActorBaseFT):
 			fields['first_seen'] = first_seen.isoformat()+'Z'
 
 		try:
-			if len(fields['sources'] <= 1):
-				sources = fields['sources'][0]
-			else:
+			if fields['sources'] is not None:
 				sources = ", ".join(fields['sources'])
+			else:
+				sources = ""
 		except Exception as e:
-			LOG.exception("Error parsing out sources field: \n\t" + e)
+			LOG.exception("Error parsing out sources field: \n\t" + e.message)
 			raise
 
 		if 'recordedfuture_evidencedetails' in fields:
@@ -83,7 +83,7 @@ class SuricataOutput(actorbase.ActorBaseFT):
 					)
 				)
 		except Exception as e:
-			LOG.exception("Error writing suricata rules: \n\t" + e)
+			LOG.exception("Error writing suricata rules: \n\t" + e.message)
 			raise
 
 		self.statistics['message.sent'] += 1
