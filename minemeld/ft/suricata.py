@@ -31,7 +31,7 @@ class SuricataOutput(actorbase.ActorBaseFT):
 	def reset(self):
 		pass
 
-	def _parse_ip_indicators(indicators):
+	def _parse_ip_indicators(self, indicators):
 		ipRange = indicators.split('-')
 		if ipRange[0] == ipRange[1]:
 			procIndicators = [netaddr.IPAddress(ipRange[0])]
@@ -83,8 +83,7 @@ class SuricataOutput(actorbase.ActorBaseFT):
 			sources = sources + ': ' + ", ".join(fields['recordedfuture_evidencedetails'])
 
 		if fields['type'] == "IPv4":
-			ipIndicators = fields['@indicator']
-			procIndicators = self._parse_ip_indicators(ipIndicators)
+			procIndicators = self._parse_ip_indicators(fields['@indicator'])
 
 		try:
 			if message == "update":
