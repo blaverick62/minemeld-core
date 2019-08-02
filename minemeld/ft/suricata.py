@@ -21,6 +21,8 @@ class SuricataOutput(actorbase.ActorBaseFT):
 		super(SuricataOutput, self).configure()
 
 		self.suricata_filepath = self.config.get('suricata_filepath', '/DIP/suricata/')
+		if self.suricata_filepath[-1] != '/':
+			self.suricata_filepath += '/'
 
 	def initialize(self):
 		pass
@@ -84,12 +86,13 @@ class SuricataOutput(actorbase.ActorBaseFT):
 
 		if fields['type'] == "IPv4":
 			procIndicators = self._parse_ip_indicators(fields['@indicator'])
+			rule = "alert ip $HOME_NET any -> {} any (msg:\"{}. Confidence: {}\"; classtype:trojan-activity; sid:{}; rev:1;)\n"
 
 		try:
 			if message == "update":
 				for indivIndicator in procIndicators:
-					with open(self.suricata_filepath + 'minemeld-' + day + '.rules', 'a+') as f:
-						f.write("alert ip $HOME_NET any -> {} any (msg:\"{}. Confidence: {}\"; classtype:trojan-activity; sid:{}; rev:1;)\n".format(
+					with open("{}minemeld-{}-{}.rules".format(self.suricata_filepath, fields['type'], day), 'a+') as f:
+						f.write(rule.format(
 							str(indivIndicator),
 							sources,
 							fields['confidence'],
