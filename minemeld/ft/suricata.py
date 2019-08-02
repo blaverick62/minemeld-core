@@ -19,7 +19,7 @@ class SuricataOutput(actorbase.ActorBaseFT):
 	def configure(self):
 		super(SuricataOutput, self).configure()
 
-		self.suricata_filepath = self.config.get('suricata_filepath', "/DIP/suricata/")
+		self.suricata_filepath = self.config.get('suricata_filepath', '/DIP/suricata/')
 
 	def initialize(self):
 		pass
@@ -61,9 +61,12 @@ class SuricataOutput(actorbase.ActorBaseFT):
 			)
 			fields['first_seen'] = first_seen.isoformat()+'Z'
 
-		f = open("/DIP/suricata/minemeld.rules", 'a+')
-		f.write("Indicator:{},Origin:{}".format(fields['@indicator'], fields['@origin']))
-		f.close()
+		try:
+			with open(self.suricata_filepath + 'minemeld-' + day + '.rules', 'a+') as f:
+				f.write("{} {}\n".format(fields['@indicator'], fields['@origin']))
+		except as e:
+			LOG.exception("Error writing suricata rules: \n\t" + e)
+			raise
 
 		self.statistics['message.sent'] += 1
 
