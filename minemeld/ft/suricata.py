@@ -74,7 +74,7 @@ class SuricataOutput(actorbase.ActorBaseFT):
 			sources = sources + ': ' + ", ".join(fields['recordedfuture_evidencedetails'])
 
 		try:
-			if self.message == "update":
+			if message == "update":
 				with open(self.suricata_filepath + 'minemeld-' + day + '.rules', 'a+') as f:
 					f.write("alert ip $HOME_NET any -> {} any (msg:\"{}. Confidence: {}\"; classtype:trojan-activity; sid:{}; rev:1;)\n".format(
 						fields['@indicator'],
