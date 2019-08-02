@@ -62,17 +62,23 @@ class SuricataOutput(actorbase.ActorBaseFT):
 			fields['first_seen'] = first_seen.isoformat()+'Z'
 
 		try:
-			if len(fields['sources']) <= 1:
-				sources = fields['sources'][0]
-			else:
-				sources = ", ".join(fields['sources'])
+			sources = ", ".join(fields['sources'])
 		except Exception as e:
 			LOG.exception("Error parsing out sources field: \n\t" + e)
 			raise
 
+		if 'recordedfuture_evidencedetails' in fields:
+			sources = sources + ': ' + ", ".join(fields['recordedfuture_evidencedetails'])
+
 		try:
 			with open(self.suricata_filepath + 'minemeld-' + day + '.rules', 'a+') as f:
-				f.write("{} {} {}\n".format(fields['@indicator'], sources, fields['confidence']))
+				f.write("alert ip $HOME_NET any -> {} any (msg:\"{}. Confidence: {}\"; classtype:trojan-activity; sid:{}; rev:1;)\n".format(
+					fields['@indicator'],
+					sources,
+					fields['confidence'],
+					self.statistics['message.sent']
+					)
+				)
 		except Exception as e:
 			LOG.exception("Error writing suricata rules: \n\t" + e)
 			raise
