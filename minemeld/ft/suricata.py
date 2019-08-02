@@ -83,7 +83,8 @@ class SuricataOutput(actorbase.ActorBaseFT):
 			sources = sources + ': ' + ", ".join(fields['recordedfuture_evidencedetails'])
 
 		if fields['type'] == "IPv4":
-			procIndicators = self._parse_ip_indicators(fields['@indicator'])
+			ipIndicators = fields['@indicator']
+			procIndicators = self._parse_ip_indicators(ipIndicators)
 
 		try:
 			if message == "update":
