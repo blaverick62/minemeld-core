@@ -62,8 +62,17 @@ class SuricataOutput(actorbase.ActorBaseFT):
 			fields['first_seen'] = first_seen.isoformat()+'Z'
 
 		try:
+			if len(fields['sources']) <= 1:
+				sources = fields['sources'][0]
+			else:
+				sources = ", ".join(fields['sources'])
+		except Exception as e:
+			LOG.exception("Error parsing out sources field: \n\t" + e)
+			raise
+
+		try:
 			with open(self.suricata_filepath + 'minemeld-' + day + '.rules', 'a+') as f:
-				f.write("{} {} {}\n".format(fields['@indicator'], fields['sources'], fields['confidence']))
+				f.write("{} {} {}\n".format(fields['@indicator'], sources, fields['confidence']))
 		except Exception as e:
 			LOG.exception("Error writing suricata rules: \n\t" + e)
 			raise
