@@ -86,19 +86,28 @@ class SuricataOutput(actorbase.ActorBaseFT):
 
 		if fields['type'] == "IPv4":
 			procIndicators = self._parse_ip_indicators(fields['@indicator'])
-			rule = "alert ip $HOME_NET any -> {} any (msg:\"{}. Confidence: {}\"; classtype:trojan-activity; sid:{}; rev:1;)\n"
 
 		try:
 			if message == "update":
-				for indivIndicator in procIndicators:
-					with open("{}minemeld-{}-{}.rules".format(self.suricata_filepath, fields['type'], day), 'a+') as f:
-						f.write(rule.format(
-							str(indivIndicator),
-							sources,
-							fields['confidence'],
-							self.statistics['message.sent']
+				with open("{}minemeld-{}-{}.rules".format(self.suricata_filepath, fields['type'], day), 'a+') as f:
+					if fields['type'] == 'IPv4':
+						for indivIndicator in procIndicators:	
+							f.write("alert ip $HOME_NET any -> {} any (msg:\"{}. Confidence: {}\"; sid:{}; rev:1;)\n".format(
+								indivIndicator,
+								sources,
+								fields['confidence'],
+								self.statistics['message.sent']
+								)
 							)
-						)
+					elif fields['type'] == "domain":
+						f.write("alert dns $HOME_NET any -> any any (msg:\"{}. Confidence: {}\"; dns_query; content:{}; nocase; sid:{}; rev:1;)\n".format(
+								sources,
+								fields['confidence'],
+								fields['@indicator'],
+								self.statistics['message.sent']
+								)
+							)
+
 					self.statistics['message.sent'] += 1
 		except Exception as e:
 			LOG.exception("Error writing suricata rules: \n\t" + e.message)
