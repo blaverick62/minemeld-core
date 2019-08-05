@@ -111,11 +111,12 @@ class SuricataOutput(actorbase.ActorBaseFT):
 								)
 							)
 					elif fields['type'] == "md5":
-						f.write("{}\tIntel::FILE_HASH\t{}\t{}\t-\n").format(
+						f.write("{}\tIntel::FILE_HASH\t{}\t{}\t-\n".format(
 								fields['@indicator'],
 								sources,
 								fields['confidence']
 							)
+						)
 
 					self.statistics['message.sent'] += 1
 		except Exception as e:
