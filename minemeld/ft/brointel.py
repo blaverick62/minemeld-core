@@ -112,7 +112,7 @@ class BroIntelOutput(actorbase.ActorBaseFT):
 				with open("{}minemeld-{}-{}.rules".format(self.brointel_filepath, fields['type'], day), 'a+') as f:
 					for indivIndicator in procIndicators[0]:	
 						f.write("{}\t{}\t{}\t{}\t-\n".format(
-							fields['@indicator'],
+							indivIndicator,
 							intelTypes[procIndicators[1]],
 							sources,
 							details
