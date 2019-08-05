@@ -94,7 +94,7 @@ class BroIntelOutput(actorbase.ActorBaseFT):
 			LOG.exception("Error parsing out sources field: \n\t" + e.message)
 			raise
 
-		details = "Confidence: " + fields['confidence']
+		details = "Confidence: " + str(fields['confidence'])
 
 		# Add Recorded Future Details
 		if 'recordedfuture_evidencedetails' in fields:
