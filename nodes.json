@@ -65,8 +65,8 @@
     "minemeld.ft.logstash.LogstashOutput": {
         "class": "minemeld.ft.logstash:LogstashOutput"
     },
-    "minemeld.ft.suricata.SuricataOutput": {
-        "class": "minemeld.ft.suricata:SuricataOutput"
+    "minemeld.ft.brointel.BroIntelOutput": {
+        "class": "minemeld.ft.brointel:BroIntelOutput"
     },
     "minemeld.ft.o365.O365XML": {
         "class": "minemeld.ft.o365:O365XML"

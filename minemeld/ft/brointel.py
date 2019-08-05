@@ -1,7 +1,7 @@
-# Suricata Output Node
+# Bro Intel Output Node
 # 
 # Extension for Minemeld that outputs IP and Domain IOCs directly to
-# Snort/Suricata rules.
+# Bro Intel rules.
 
 from __future__ import absolute_import
 
@@ -16,16 +16,16 @@ from . import actorbase
 LOG = logging.getLogger(__name__)
 
 
-class SuricataOutput(actorbase.ActorBaseFT):
+class BroIntelOutput(actorbase.ActorBaseFT):
 	def __init__(self, name, chassis, config):
-		super(SuricataOutput, self).__init__(name, chassis, config)
+		super(BroIntelOutput, self).__init__(name, chassis, config)
 
 	def configure(self):
-		super(SuricataOutput, self).configure()
+		super(BroIntelOutput, self).configure()
 
-		self.suricata_filepath = self.config.get('suricata_filepath', '/DIP/suricata/')
-		if self.suricata_filepath[-1] != '/':
-			self.suricata_filepath += '/'
+		self.brointel_filepath = self.config.get('brointel_filepath', '/DIP/brointel/')
+		if self.brointel_filepath[-1] != '/':
+			self.brointel_filepath += '/'
 
 	def initialize(self):
 		pass
@@ -40,18 +40,27 @@ class SuricataOutput(actorbase.ActorBaseFT):
 		ipRange = indicators.split('-')
 		if ipRange[0] == ipRange[1]:
 			procIndicators = [netaddr.IPAddress(ipRange[0])]
+			intelType = 'IPv4'
 		else:
 			procIndicators = netaddr.iprange_to_cidrs(ipRange[0], ipRange[1])
-		return procIndicators
+			intelType = 'CIDR'
+		return procIndicators, intelType
 
-	def _write_suricata_rules(self, message, source=None, indicator=None, value=None):
+	def _write_brointel_rules(self, message, source=None, indicator=None, value=None):
 		now = datetime.datetime.now()
 		d = datetime.datetime.today()
 		day = d.strftime('%Y%m%d')
 
 		fields = {
-			'suricata_output_node': self.name,
+			'brointel_output_node': self.name,
 			'message': message
+		}
+
+		intelTypes = {
+			'md5': 'Intel::FILE_HASH',
+			'IPv4': 'Intel::ADDR',
+			'domain': 'Intel::DOMAIN',
+			'CIDR': 'Intel:SUBNET'
 		}
 
 		if indicator is not None:
@@ -75,6 +84,7 @@ class SuricataOutput(actorbase.ActorBaseFT):
 			)
 			fields['first_seen'] = first_seen.isoformat()+'Z'
 
+		# Join multiple sources into one string
 		try:
 			if fields['sources'] is not None:
 				sources = ", ".join(fields['sources'])
@@ -84,50 +94,40 @@ class SuricataOutput(actorbase.ActorBaseFT):
 			LOG.exception("Error parsing out sources field: \n\t" + e.message)
 			raise
 
-		if 'recordedfuture_evidencedetails' in fields:
-			sources = sources + ': ' + ", ".join(fields['recordedfuture_evidencedetails'])
+		details = "Confidence: " + fields['confidence']
 
+		# Add Recorded Future Details
+		if 'recordedfuture_evidencedetails' in fields:
+			details = details + ', Details: ' + ", ".join(fields['recordedfuture_evidencedetails'])
+
+		# Parse Indicators and Types into Tuples for writing
 		if fields['type'] == "IPv4":
 			procIndicators = self._parse_ip_indicators(fields['@indicator'])
+		else:
+			procIndicators = ([fields['@indicator']], fields['type'])
+
 
 		try:
 			if message == "update":
-				with open("{}minemeld-{}-{}.rules".format(self.suricata_filepath, fields['type'], day), 'a+') as f:
-					if fields['type'] == 'IPv4':
-						for indivIndicator in procIndicators:	
-							f.write("alert ip $HOME_NET any -> {} any (msg:\"{}. Confidence: {}\"; sid:{}; rev:1;)\n".format(
-								indivIndicator,
-								sources,
-								fields['confidence'],
-								self.statistics['message.sent']
-								)
-							)
-					elif fields['type'] == "domain":
-						f.write("alert dns $HOME_NET any -> any any (msg:\"{}. Confidence: {}\"; dns_query; content:{}; nocase; sid:{}; rev:1;)\n".format(
-								sources,
-								fields['confidence'],
-								fields['@indicator'],
-								self.statistics['message.sent']
-								)
-							)
-					elif fields['type'] == "md5":
-						f.write("{}\tIntel::FILE_HASH\t{}\t{}\t-\n".format(
-								fields['@indicator'],
-								sources,
-								fields['confidence']
-							)
+				with open("{}minemeld-{}-{}.rules".format(self.brointel_filepath, fields['type'], day), 'a+') as f:
+					for indivIndicator in procIndicators[0]:	
+						f.write("{}\t{}\t{}\t{}\t-\n".format(
+							fields['@indicator'],
+							intelTypes[procIndicators[1]]
+							sources,
+							details
 						)
-
+					)
 					self.statistics['message.sent'] += 1
 		except Exception as e:
-			LOG.exception("Error writing suricata rules: \n\t" + e.message)
+			LOG.exception("Error writing bro rules: \n\t" + e.message)
 			raise
 
 		
 
 	@base._counting('update.processed')
 	def filtered_update(self, source=None, indicator=None, value=None):
-		self._write_suricata_rules(
+		self._write_brointel_rules(
 			'update',
 			source=source,
 			indicator=indicator,
@@ -136,7 +136,7 @@ class SuricataOutput(actorbase.ActorBaseFT):
 
 	@base._counting('withdraw.processed')
 	def filtered_withdraw(self, source=None, indicator=None, value=None):
-		self._write_suricata_rules(
+		self._write_brointel_rules(
 			'withdraw',
 			source=source,
 			indicator=indicator,
