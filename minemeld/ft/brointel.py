@@ -113,7 +113,7 @@ class BroIntelOutput(actorbase.ActorBaseFT):
 					for indivIndicator in procIndicators[0]:	
 						f.write("{}\t{}\t{}\t{}\t-\n".format(
 							fields['@indicator'],
-							intelTypes[procIndicators[1]]
+							intelTypes[procIndicators[1]],
 							sources,
 							details
 						)
