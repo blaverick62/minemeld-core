@@ -1,4 +1,7 @@
 # Suricata Output Node
+# 
+# Extension for Minemeld that outputs IP and Domain IOCs directly to
+# Snort/Suricata rules.
 
 from __future__ import absolute_import
 
@@ -106,6 +109,12 @@ class SuricataOutput(actorbase.ActorBaseFT):
 								fields['@indicator'],
 								self.statistics['message.sent']
 								)
+							)
+					elif fields['type'] == "md5":
+						f.write("{}\tIntel::FILE_HASH\t{}\t{}\t-\n").format(
+								fields['@indicator'],
+								sources,
+								fields['confidence']
 							)
 
 					self.statistics['message.sent'] += 1
