@@ -60,7 +60,7 @@ class BroIntelOutput(actorbase.ActorBaseFT):
 			'md5': 'Intel::FILE_HASH',
 			'IPv4': 'Intel::ADDR',
 			'domain': 'Intel::DOMAIN',
-			'CIDR': 'Intel:SUBNET'
+			'CIDR': 'Intel::SUBNET'
 		}
 
 		if indicator is not None:
