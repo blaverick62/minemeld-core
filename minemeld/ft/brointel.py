@@ -111,7 +111,7 @@ class BroIntelOutput(actorbase.ActorBaseFT):
 			if message == "update":
 				with open("{}minemeld-{}-{}.rules".format(self.brointel_filepath, fields['type'], day), 'a+') as f:
 					for indivIndicator in procIndicators[0]:	
-						f.write("{}\t{}\t{}\t{}\t-\n".format(
+						f.write("{}\t{}\t{}\t{}\n".format(
 							indivIndicator,
 							intelTypes[procIndicators[1]],
 							sources,
