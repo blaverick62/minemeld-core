@@ -109,7 +109,7 @@ class BroIntelOutput(actorbase.ActorBaseFT):
 
 		try:
 			if message == "update":
-				with open("{}minemeld-{}-{}.rules".format(self.brointel_filepath, fields['type'], day), 'a+') as f:
+				with open("{}intel.dat".format(self.brointel_filepath), 'a+') as f:
 					for indivIndicator in procIndicators[0]:	
 						f.write("{}\t{}\t{}\t{}\n".format(
 							indivIndicator,
@@ -118,6 +118,17 @@ class BroIntelOutput(actorbase.ActorBaseFT):
 							details
 						)
 					)
+					self.statistics['message.sent'] += 1
+
+			if message == "withdraw":
+				with open("{}intel.dat".format(self.brointel_filepath), 'r+') as f:
+					temp_f = f.readlines()
+					for indivIndicator in procIndicators[0]:
+						f.seek(0)
+						for line in temp_f:
+							if indivIndicator not in line:
+								f.write(line)
+						f.truncate()
 					self.statistics['message.sent'] += 1
 		except Exception as e:
 			LOG.exception("Error writing bro rules: \n\t" + e.message)
