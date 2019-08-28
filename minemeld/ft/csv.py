@@ -113,39 +113,62 @@ class CSVFT(basepoller.BasePollerFT):
         return r.prepare()
 
     def _build_iterator(self, now):
-        _session = requests.Session()
+        if 'local' in self.url:
+            localaddr = self.url.split(':')
+            try:
+                files = [f for f in os.listdir(localaddr[1]) if os.path.isfile(os.path.join(localaddr[1], f)) and f[-4:] == ".csv"]
+            except:
+                LOG.debug("%s - exception in local directory listing: %s",
+                    self.name, localaddr)
+                raise
 
-        prepreq = self._build_request(now)
+            masterCsv = ""
+            for localCsv in files:
+                with open(localCsv. 'r') as f:
+                    tf = f.readlines()
+                    for line in tf:
+                        if "event_id" not in line:
+                            masterCsv += line
 
-        # this is to honour the proxy environment variables
-        rkwargs = _session.merge_environment_settings(
-            prepreq.url,
-            {}, None, None, None  # defaults
-        )
-        rkwargs['stream'] = True
-        rkwargs['verify'] = self.verify_cert
-        rkwargs['timeout'] = self.polling_timeout
-
-        r = _session.send(prepreq, **rkwargs)
-
-        try:
-            r.raise_for_status()
-        except:
-            LOG.debug('%s - exception in request: %s %s',
-                      self.name, r.status_code, r.content)
-            raise
-
-        response = r.raw
-        if self.ignore_regex is not None:
-            response = itertools.ifilter(
-                lambda x: self.ignore_regex.match(x) is None,
-                r.raw
+            csvreader = csv.DictReader(
+                masterCsv,
+                fieldnames=self.fieldnames,
+                **self.dialect
             )
+        else:
+            _session = requests.Session()
 
-        csvreader = csv.DictReader(
-            response,
-            fieldnames=self.fieldnames,
-            **self.dialect
-        )
+            prepreq = self._build_request(now)
+
+            # this is to honour the proxy environment variables
+            rkwargs = _session.merge_environment_settings(
+                prepreq.url,
+                {}, None, None, None  # defaults
+            )
+            rkwargs['stream'] = True
+            rkwargs['verify'] = self.verify_cert
+            rkwargs['timeout'] = self.polling_timeout
+
+            r = _session.send(prepreq, **rkwargs)
+
+            try:
+                r.raise_for_status()
+            except:
+                LOG.debug('%s - exception in request: %s %s',
+                          self.name, r.status_code, r.content)
+                raise
+
+            response = r.raw
+            if self.ignore_regex is not None:
+                response = itertools.ifilter(
+                    lambda x: self.ignore_regex.match(x) is None,
+                    r.raw
+                )
+
+            csvreader = csv.DictReader(
+                response,
+                fieldnames=self.fieldnames,
+                **self.dialect
+            )
 
         return csvreader
