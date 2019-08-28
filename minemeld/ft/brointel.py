@@ -126,7 +126,7 @@ class BroIntelOutput(actorbase.ActorBaseFT):
 					for indivIndicator in procIndicators[0]:
 						f.seek(0)
 						for line in temp_f:
-							if indivIndicator not in line:
+							if str(indivIndicator) not in line:
 								f.write(line)
 						f.truncate()
 					self.statistics['message.sent'] += 1
