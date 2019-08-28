@@ -41,6 +41,9 @@
     "minemeld.ft.http.HttpFT": {
         "class": "minemeld.ft.http:HttpFT"
     },
+    "minemeld.ft.icoast.LocalICOAST": {
+        "class": "minemeld.ft.icoast:LocalICOAST"
+    },
     "minemeld.ft.ipop.AggregateIPv4FT": {
         "class": "minemeld.ft.ipop:AggregateIPv4FT"
     },
