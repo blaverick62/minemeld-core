@@ -24,6 +24,7 @@ import re
 import itertools
 import csv
 import requests
+import os
 
 from . import basepoller
 
