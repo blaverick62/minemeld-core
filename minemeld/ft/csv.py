@@ -125,7 +125,7 @@ class CSVFT(basepoller.BasePollerFT):
 
             masterCsv = ""
             for localCsv in files:
-                with open(localCsv, 'r') as f:
+                with open(os.path.join(localaddr[1], localCsv), 'r') as f:
                     tf = f.readlines()
                     for line in tf:
                         if "event_id" not in line:
