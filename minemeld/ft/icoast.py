@@ -68,6 +68,8 @@ class LocalICOAST(csv.CSVFT):
 			return []
 		else:
 			result['icoast_eventId'] = eventId
+			
+		result['confidence'] = self.confidence
 
 		return [[indicator, result]]
 
