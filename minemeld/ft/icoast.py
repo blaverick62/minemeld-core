@@ -23,11 +23,11 @@ class LocalICOAST(csv.CSVFT):
 		row.pop(None, None)
 
 		result = {}
-		LOG.debug("%s - processing item: %s",
+		LOG.info("%s - processing item: %s",
 			self.name, str(row))
 		indicator = row.get('value', '')
 		if indicator == '':
-			LOG.debug("%s - unable to parse ICOAST indicator: %s",
+			LOG.info("%s - unable to parse ICOAST indicator: %s",
 				self.name, indicator)
 			return []
 

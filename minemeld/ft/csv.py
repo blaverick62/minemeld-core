@@ -125,6 +125,8 @@ class CSVFT(basepoller.BasePollerFT):
 
             masterCsv = ""
             for localCsv in files:
+                log.info("%s - reading csv: %s",
+                    self.name, os.pat.join(localaddr[1], localCsv))
                 with open(os.path.join(localaddr[1], localCsv), 'r') as f:
                     tf = f.readlines()
                     for line in tf:
