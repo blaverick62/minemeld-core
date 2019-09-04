@@ -25,6 +25,7 @@ import itertools
 import csv
 import requests
 import os
+import fileinput
 
 from . import basepoller
 
@@ -119,27 +120,28 @@ class CSVFT(basepoller.BasePollerFT):
                 self.name)
             localaddr = self.url.split(':')
             try:
-                files = [f for f in os.listdir(localaddr[1]) if os.path.isfile(os.path.join(localaddr[1], f)) and f[-4:] == ".csv"]
+                files = []
+                for f in os.listdir(localaddr[1]):
+                    if os.path.isfile(os.path.join(localaddr[1], f)) and f[-4:] == ".csv":
+                        files.append(os.path.join(localaddr[1], f))
             except:
                 LOG.debug("%s - exception in local directory listing: %s",
                     self.name, localaddr)
                 raise
 
-            masterCsv = ""
-            for localCsv in files:
-                LOG.info("%s - reading csv: %s",
-                    self.name, os.path.join(localaddr[1], localCsv))
-                with open(os.path.join(localaddr[1], localCsv), 'r') as f:
-                    tf = f.readlines()
-                    for line in tf:
-                        if "event_id" not in line:
-                            masterCsv += line
+            allfiles = fileinput.input(files)
 
-            csvreader = csv.DictReader(
-                masterCsv,
-                fieldnames=self.fieldnames,
-                **self.dialect
-            )
+            #masterCsv = ""
+            #for localCsv in files:
+            #    LOG.info("%s - reading csv: %s",
+            #        self.name, os.path.join(localaddr[1], localCsv))
+            #    with open(os.path.join(localaddr[1], localCsv), 'r') as f:
+            #        tf = f.readlines()
+            #        for line in tf:
+            #            if "event_id" not in line:
+            #                masterCsv += line
+            with open(allfiles) as f:
+                csvreader = csv.reader(f)
         else:
             _session = requests.Session()
 

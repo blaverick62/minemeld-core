@@ -20,18 +20,16 @@ class LocalICOAST(csv.CSVFT):
 		self.confidence = self.config.get('confidence', 95)
 
 	def _process_item(self, row):
-		row.pop(None, None)
-
 		result = {}
 		LOG.info("%s - processing item: %s",
 			self.name, str(row))
-		indicator = row.get('value', '')
+		indicator = row[3]
 		if indicator == '':
 			LOG.info("%s - unable to parse ICOAST indicator: %s",
 				self.name, indicator)
 			return []
 
-		indicatorType = row.get('type', '')
+		indicatorType = row[2]
 		if indicatorType == '':
 			LOG.info("%s - unable to parse ICOAST indicator type: %s",
 				self.name, indicatorType)
@@ -59,13 +57,13 @@ class LocalICOAST(csv.CSVFT):
 		else:
 			result['type'] = typeMatch[indicatorType]
 
-		eventDate = row.get('event_date', '')
+		eventDate = row[4]
 		if eventDate == '':
 			return []
 		else:
 			result['icoast_eventDate'] = eventDate
 
-		eventId = row.get('event_id', '')
+		eventId = row[0]
 		if eventId == '':
 			return []
 		else:
