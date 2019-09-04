@@ -115,6 +115,8 @@ class CSVFT(basepoller.BasePollerFT):
 
     def _build_iterator(self, now):
         if 'local' in self.url:
+            LOG.info("%s - checking for local csvs", 
+                self.name)
             localaddr = self.url.split(':')
             try:
                 files = [f for f in os.listdir(localaddr[1]) if os.path.isfile(os.path.join(localaddr[1], f)) and f[-4:] == ".csv"]
@@ -125,8 +127,8 @@ class CSVFT(basepoller.BasePollerFT):
 
             masterCsv = ""
             for localCsv in files:
-                log.info("%s - reading csv: %s",
-                    self.name, os.pat.join(localaddr[1], localCsv))
+                LOG.info("%s - reading csv: %s",
+                    self.name, os.path.join(localaddr[1], localCsv))
                 with open(os.path.join(localaddr[1], localCsv), 'r') as f:
                     tf = f.readlines()
                     for line in tf:
