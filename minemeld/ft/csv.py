@@ -130,7 +130,7 @@ class CSVFT(basepoller.BasePollerFT):
                 raise
 
             allfiles = fileinput.input(files)
-
+            csvreader = csv.reader(allfiles)
             #masterCsv = ""
             #for localCsv in files:
             #    LOG.info("%s - reading csv: %s",
@@ -140,8 +140,7 @@ class CSVFT(basepoller.BasePollerFT):
             #        for line in tf:
             #            if "event_id" not in line:
             #                masterCsv += line
-            with open(allfiles) as f:
-                csvreader = csv.reader(f)
+            
         else:
             _session = requests.Session()
 
